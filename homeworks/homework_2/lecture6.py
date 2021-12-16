@@ -35,17 +35,10 @@ class Card(CardABC):
 
     def __init__(self, suit, rank):
         super().__init__()
-
-        if suit in self.__class__.suits:
-            self.suit = suit
-        else:
-            raise LookupError("Suit not found")
-
-        if rank in self.__class__.ranks:
-            self.rank = rank
-        else:
-            raise LookupError("Card initiation failed: check the card rank")
-        self.soft, self.hard = self.value()
+        self.rank = rank
+        self.suit = suit
+        self.suits = []
+        self.ranks = []
         
     def __repr__(self):
         return f"{self.rank} of {self.suit}"
@@ -165,7 +158,7 @@ class Game(object):
     def __init__(self, deck):
         super().__init__()
         self.deck = deck
-        self.number_of_players = 1
+        self.number_of_players = 0
         self.dealer = Player("Dealer")
         self.max_players = 5
         self.users = []
@@ -186,8 +179,9 @@ class Game(object):
                 Game.add_player(self)
         else:
             print("You reached maximum number of players!")
-        if self.number_of_players == 1:
+        if self.number_of_players == 0:
             print("No player joined the game.")
+            quit()
                 
 
     def initial_deal(self):
@@ -196,10 +190,10 @@ class Game(object):
         sleep(1)
 
         for i in range(2):
-            self.dealer.hand.append(self.deck.deal())
+            self.dealer.hand.append(self.deck.pop())
             self.dealer.soft, self.dealer.hard = self.check_hand(self.dealer.hand)
             for user in self.users:
-                user.hand.append(self.deck.deal())
+                user.hand.append(self.deck.pop())
                 user.soft, user.hard = self.check_hand(user.hand)
 
     def show_status(self):
@@ -217,7 +211,7 @@ class Game(object):
         return [soft_sum, hard_sum]
 
     def ask_user(self, user: Player):
-        user.__repr__()
+        print(user.__repr__())
         if user.soft == user.hard:
             print(f'Your total is {user.soft}')
         else:
@@ -234,7 +228,7 @@ class Game(object):
         elif user.soft < 21 or user.hard < 21:
             ask_player = input("Do you want another card(y/n): ")
             if  ask_player == "y":
-                user.hand.append(self.deck.deal())
+                user.hand.append(self.deck.pop())
                 user.soft, user.hard = self.check_hand(user.hand)
                 self.ask_user(user)
             elif ask_player == "n":
@@ -244,58 +238,22 @@ class Game(object):
                 self.ask_user(user)
 
     def ask_dealer(self):
-        self.dealer.__repr__()
-        # if self.dealer.soft == self.dealer.hard:
-        #     print(f'Dealer`s total is {self.dealer.soft}')
-        # else:
-        #     print(f'Dealer`s sums are - soft: {self.dealer.soft}, hard: {self.dealer.hard}')
+        print(self.dealer.__repr__())
+        if self.dealer.soft == self.dealer.hard:
+            print(f'Dealer`s total is {self.dealer.soft}')
+        else:
+            print(f'Dealer`s sums are - soft: {self.dealer.soft}, hard: {self.dealer.hard}')
 
-        # if self.dealer.soft == 21 or self.dealer.hard == 21:
-        #     self.dealer.win = 1
-        #     for user in self.users:
-        #         if user.win is None:
-        #             user.win = 0
-        #     print("Blackjack!!! You won! \n")
-        # elif self.dealer.soft > 16 and self.dealer.hard > 16:
-        #     self.dealer.win = 0
-        #     for user in self.users:
-        #         if user.win is None:
-        #             user.win = 1
-        #     print("You bust((( \n")
-        # elif self.dealer.soft <= 16 and self.dealer.hard <= 16:
-        #     print("Opening a card")
-        #     sh(self.deck)
-        #     self.dealer.hand.append(self.deck[0])
-        #     self.dealer.soft, self.dealer.hard = self.check_hand(self.dealer.hand)
-        #     self.deck.pop(0)
-        #     self.ask_dealer()
-        # elif self.dealer.soft <= 16:
-        #     print("Opening a card")
-        #     sh(self.deck)
-        #     self.dealer.hand.append(self.deck[0])
-        #     self.dealer.soft, self.dealer.hard = self.check_hand(self.dealer.hand)
-        #     self.deck.pop(0)
-        #     self.ask_dealer()
-
-        # def looping():
-        #     soft_sum, _ = Game.check_hand(self, self.dealer.hand)
-        #     print(self.dealer)
-
-        #     print(f"Dealer's total is {soft_sum}")
-
-        #     if soft_sum<=16:
-        #         print("Opening a card")
-        #         self.dealer.hand.append((self.deck.deal(), True))
-        #         looping()
-        #         sleep(1)
-        #     else:
-        #         self.dealer.soft = soft_sum
-        #         if self.dealer.soft>=21:
-        #             print("Dealer bust (((")
-        #             self.dealer.win = 0
-
-        # looping()
-
+        if self.dealer.soft <= 16:
+                print("Opening a card")
+                self.dealer.hand.append(self.deck.pop())
+                self.dealer.soft, self.dealer.hard = self.check_hand(self.dealer.hand)
+                self.ask_dealer()
+                sleep(1)
+        else:
+            if self.dealer.soft > 21:
+                print("Dealer bust (((")
+                self.dealer.win = 0
 
         print("____________________")
         print("Final Results are:")

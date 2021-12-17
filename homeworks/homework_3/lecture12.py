@@ -203,7 +203,6 @@ class Game(object):
                 self.result_dealer = self.dealer.soft if self.dealer.hard > 21 else max(self.dealer.soft, self.dealer.hard)
         
 
-
 def simulate(parameter):
         dec = Deck()
         game = Game(dec.deck)
@@ -221,11 +220,13 @@ def simulate(parameter):
             else:
                 return 0
 
+            
 def main():
     result_dict = {}
     for i in range(1, 21):
-        result = simulate(parametre=i)
-        result_dict[i] = result
+        result_dict[f"param_{i}"] = [simulate(parameter=i) for j in range(0, 10000)]
+    return result_dict
+   
     
 if __name__ == "__main__":
     main()

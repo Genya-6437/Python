@@ -203,29 +203,23 @@ class Game(object):
                 self.result_dealer = self.dealer.soft if self.dealer.hard > 21 else max(self.dealer.soft, self.dealer.hard)
         
 
-    def final_result(self):
-        if self.result_user > 21:
-            return 3
-        elif self.result_user < 21 and self.result_dealer > 21:
-            return 2
-        else:
-            if self.result_user < self.result_dealer:
-                return 1
-            else:
-                return 0
 
-
-def simulate(parametre):
-    result = []
-    for i in range(0, 10000):
+def simulate(parameter):
         dec = Deck()
         game = Game(dec.deck)
         game.initial_deal()
-        game.ask_user(parametre=parametre)
+        game.ask_user(parameter=parameter)
         game.ask_dealer()
-        a = game.final_result()
-        result.append(a)
-    return result
+        
+        if game.result_user > 21:
+            return 3
+        elif game.result_user < 21 and game.result_dealer > 21:
+            return 2
+        else:
+            if game.result_user < game.result_dealer:
+                return 1
+            else:
+                return 0
 
 def main():
     result_dict = {}
